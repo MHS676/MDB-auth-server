@@ -1,0 +1,46 @@
+# Build arguments
+ARG NODE_VERSION=18
+ARG ALPINE_VERSION=3.18
+
+FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS base
+
+WORKDIR /app
+
+# Install dependencies
+COPY package*.json ./
+RUN npm ci
+
+# Copy source
+COPY . .
+
+# Build
+RUN npm run build
+
+# Production image
+FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS production
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm ci --only=production && \
+    npm install @prisma/cli
+
+# Copy Prisma files from builder
+COPY --from=base /app/dist ./dist
+COPY prisma ./prisma
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Expose port
+EXPOSE 3001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3001/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+
+# Run application
+CMD ["node", "dist/main.js"]
