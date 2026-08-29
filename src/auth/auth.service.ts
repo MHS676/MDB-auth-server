@@ -73,7 +73,7 @@ export class AuthService {
 
     const access_token = this.jwtService.sign(payload, {
       expiresIn: process.env.JWT_EXPIRATION || '24h',
-    });
+    } as any);
 
     return {
       access_token,
