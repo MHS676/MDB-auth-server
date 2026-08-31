@@ -1,6 +1,7 @@
 export class LoginDto {
   email: string;
-  password: string;
+  password?: string;
+  secretPass?: string;
 }
 
 export class RegisterDto {

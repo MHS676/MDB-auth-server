@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, Request, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Request, HttpCode, HttpStatus, Delete, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -31,5 +31,20 @@ export class AuthController {
     return {
       user: req.user,
     };
+  }
+}
+
+@Controller('users')
+export class UsersController {
+  constructor(private readonly authService: AuthService) {}
+
+  @Get()
+  async getAllUsers() {
+    return this.authService.getAllUsers();
+  }
+
+  @Delete(':id')
+  async deleteUser(@Param('id') id: string) {
+    return this.authService.deleteUser(id);
   }
 }
