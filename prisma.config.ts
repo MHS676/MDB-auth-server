@@ -1,4 +1,9 @@
 import "dotenv/config";
+import { defineConfig } from "prisma/config";
 
-// Prisma 5 configuration - datasource URL is in schema.prisma
-export default {};
+export default defineConfig({
+  schema: "prisma/schema.prisma",
+  datasource: {
+    url: process.env.DATABASE_URL,
+  },
+});
